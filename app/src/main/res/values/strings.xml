@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">Hardware APIs</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="music_file">music.mp3</string>
+    <string name="music_icon_text">Music Icon</string>
+    <string name="btn_play">Play</string>
+    <string name="take_photo">Take Photho</string>
+    <string name="content_photo">Photo Taken</string>
+    <string name="btn_send">Send</string>
+</resources>
