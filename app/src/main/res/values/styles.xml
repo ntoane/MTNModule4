@@ -6,6 +6,10 @@
         <item name="android:paddingRight">@dimen/padding_horizontal</item>
     </style>
 
+    <style name="splash_background">
+        <item name="android:background">@drawable/splash_background</item>
+    </style>
+
     <style name="white_background">
         <item name="android:background">@android:color/white</item>
         <item name="android:layout_marginTop">@dimen/margin_top</item>

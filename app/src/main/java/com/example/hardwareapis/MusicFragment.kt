@@ -1,59 +1,71 @@
 package com.example.hardwareapis
 
+import android.media.MediaPlayer
 import android.os.Bundle
-import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
+import android.os.Handler
 import android.view.View
-import android.view.ViewGroup
+import android.widget.SeekBar
+import androidx.fragment.app.Fragment
+import kotlinx.android.synthetic.main.fragment_music.*
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
+class MusicFragment : Fragment(R.layout.fragment_music) {
+    //for playing music when seekBar changed
+    lateinit var runnable: Runnable
+    private var handler = Handler()
 
-/**
- * A simple [Fragment] subclass.
- * Use the [MusicFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
-class MusicFragment : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
+        //Create MediaPlayer Object
+        val mediaPlayer: MediaPlayer = MediaPlayer.create(context, R.raw.music)
+        //add seekbar and set progress to 0 and max duration to duration of music
+        seekBar.progress = 0
+        seekBar.max = mediaPlayer.duration
+
+        //Player button event
+        playBtn.setOnClickListener {
+            //Check if mediaPlayer is not playing
+            if(!mediaPlayer.isPlaying) {
+                mediaPlayer.start()
+                //Change button text to pause
+                playBtn.text = "Pause"
+                initializeSeekBar(mediaPlayer)
+            } else {
+                mediaPlayer.pause()
+                playBtn.text = "Play"
+            }
         }
-    }
-
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_music, container, false)
-    }
-
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment MusicFragment.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            MusicFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
+        // Implement seekBar funtionality
+        seekBar.setOnSeekBarChangeListener(object: SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(p0: SeekBar?, progress: Int, fromUser: Boolean) {
+                if(fromUser) {
+                    mediaPlayer.seekTo(progress)
                 }
             }
+
+            override fun onStartTrackingTouch(p0: SeekBar?) {
+
+            }
+
+            override fun onStopTrackingTouch(p0: SeekBar?) {
+
+            }
+        })
+
+    }
+
+    private fun initializeSeekBar(mediaPlayer: MediaPlayer) {
+        runnable = Runnable {
+            if(mediaPlayer.isPlaying) {
+                seekBar.progress = mediaPlayer.currentPosition
+            }
+            handler.postDelayed(runnable, 1000)
+        }
+        handler.postDelayed(runnable, 1000)
+        //when player finish, set seekBar to 0
+        mediaPlayer.setOnCompletionListener {
+            playBtn.text = "Play"
+            seekBar.progress = 0
+        }
     }
 }

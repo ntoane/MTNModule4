@@ -1,59 +1,115 @@
 package com.example.hardwareapis
 
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.graphics.Bitmap
 import android.os.Bundle
-import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
+import android.provider.MediaStore
 import android.view.View
-import android.view.ViewGroup
+import android.widget.Toast
+import androidx.core.app.ActivityCompat.requestPermissions
+import androidx.core.content.ContextCompat.checkSelfPermission
+import androidx.fragment.app.Fragment
+import com.google.android.gms.ads.AdListener
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.InterstitialAd
+import com.google.android.gms.ads.MobileAds
+import kotlinx.android.synthetic.main.fragment_photos.*
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
 
-/**
- * A simple [Fragment] subclass.
- * Use the [PhotosFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
-class PhotosFragment : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
+class PhotosFragment : Fragment(R.layout.fragment_photos) {
+    private var mInterstitialAd: InterstitialAd? = null
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
+        //Disable the button
+        button.isEnabled = false;
+
+        if (checkSelfPermission(requireContext(), android.Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(requireActivity(), arrayOf(android.Manifest.permission.CAMERA), 111)
+        } else {
+            button.isEnabled = true
+
+            //Load camera
+            button.setOnClickListener {
+                //initializing the Google Admob SDK
+                MobileAds.initialize(context)
+
+                //Initialize mInterstitialAd object and set Ad Unit Id
+                mInterstitialAd = InterstitialAd(context)
+                mInterstitialAd!!.adUnitId = "ca-app-pub-3940256099942544/1033173712"
+
+                //Load an Interstitial ad
+                mInterstitialAd!!.loadAd(AdRequest.Builder().build())
+
+                if (mInterstitialAd!!.isLoaded) {
+                    mInterstitialAd!!.show()
+                } else {
+                    Toast.makeText ( context, "Failed to Load Interstitial Ad, please click Take Photo button again", Toast.LENGTH_LONG).show()
+                }
+
+                /*mInterstitialAd!!.adListener = object: AdListener() {
+                    override fun onAdLoaded() {
+                        // Code to be executed when an ad finishes loading.
+                        Toast.makeText ( context, "Ad Finished loading", Toast.LENGTH_LONG).show()
+                    }
+
+                    override fun onAdFailedToLoad(errorCode: Int) {
+                        // Code to be executed when an ad request fails.
+                        super.onAdFailedToLoad(errorCode);
+                        Toast.makeText ( context, "Ad request failed", Toast.LENGTH_LONG).show()
+                    }
+
+                    override fun onAdOpened() {
+                        // Code to be executed when the ad is displayed.
+                        Toast.makeText ( context, "Displaying Ad", Toast.LENGTH_LONG).show()
+                    }
+
+                    override fun onAdClicked() {
+                        // Code to be executed when the user clicks on an ad.
+                        Toast.makeText ( context, "You clicked to open an Ad", Toast.LENGTH_LONG).show()
+                    }
+
+                    override fun onAdLeftApplication() {
+                        // Code to be executed when the user has left the app.
+                        Toast.makeText ( context, "You left the Interstitial Ad App", Toast.LENGTH_LONG).show()
+                    }
+
+                    override fun onAdClosed() {
+                        // Code to be executed when the interstitial ad is closed.
+                        Toast.makeText ( context, "Ad closed, loading new Activity", Toast.LENGTH_LONG).show()
+                        //Load a new activity
+                        //val intent = Intent(this,MainActivity::class.java)
+                        //startActivity(intent)
+                    }
+                }*/
+
+                //Now, Load the Camera Intent
+                var cameraIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+                startActivityForResult(cameraIntent, 101)
+            }
+        }
+
+
+
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if(requestCode == 101) {
+            var image: Bitmap? = data?.getParcelableExtra("data")
+            imageView.setImageBitmap(image)
         }
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_photos, container, false)
-    }
-
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment PhotosFragment.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            PhotosFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
-                }
-            }
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if(requestCode == 111 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            button.isEnabled = true
+        }
     }
 }
