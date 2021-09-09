@@ -10,10 +10,7 @@ import android.widget.Toast
 import androidx.core.app.ActivityCompat.requestPermissions
 import androidx.core.content.ContextCompat.checkSelfPermission
 import androidx.fragment.app.Fragment
-import com.google.android.gms.ads.AdListener
-import com.google.android.gms.ads.AdRequest
-import com.google.android.gms.ads.InterstitialAd
-import com.google.android.gms.ads.MobileAds
+import com.google.android.gms.ads.*
 import kotlinx.android.synthetic.main.fragment_photos.*
 
 
@@ -32,65 +29,14 @@ class PhotosFragment : Fragment(R.layout.fragment_photos) {
 
             //Load camera
             button.setOnClickListener {
-                //initializing the Google Admob SDK
-                MobileAds.initialize(context)
-
-                //Initialize mInterstitialAd object and set Ad Unit Id
-                mInterstitialAd = InterstitialAd(context)
-                mInterstitialAd!!.adUnitId = "ca-app-pub-3940256099942544/1033173712"
-
-                //Load an Interstitial ad
-                mInterstitialAd!!.loadAd(AdRequest.Builder().build())
-
-                if (mInterstitialAd!!.isLoaded) {
-                    mInterstitialAd!!.show()
-                } else {
-                    Toast.makeText ( context, "Failed to Load Interstitial Ad, please click Take Photo button again", Toast.LENGTH_LONG).show()
-                }
-
-                /*mInterstitialAd!!.adListener = object: AdListener() {
-                    override fun onAdLoaded() {
-                        // Code to be executed when an ad finishes loading.
-                        Toast.makeText ( context, "Ad Finished loading", Toast.LENGTH_LONG).show()
-                    }
-
-                    override fun onAdFailedToLoad(errorCode: Int) {
-                        // Code to be executed when an ad request fails.
-                        super.onAdFailedToLoad(errorCode);
-                        Toast.makeText ( context, "Ad request failed", Toast.LENGTH_LONG).show()
-                    }
-
-                    override fun onAdOpened() {
-                        // Code to be executed when the ad is displayed.
-                        Toast.makeText ( context, "Displaying Ad", Toast.LENGTH_LONG).show()
-                    }
-
-                    override fun onAdClicked() {
-                        // Code to be executed when the user clicks on an ad.
-                        Toast.makeText ( context, "You clicked to open an Ad", Toast.LENGTH_LONG).show()
-                    }
-
-                    override fun onAdLeftApplication() {
-                        // Code to be executed when the user has left the app.
-                        Toast.makeText ( context, "You left the Interstitial Ad App", Toast.LENGTH_LONG).show()
-                    }
-
-                    override fun onAdClosed() {
-                        // Code to be executed when the interstitial ad is closed.
-                        Toast.makeText ( context, "Ad closed, loading new Activity", Toast.LENGTH_LONG).show()
-                        //Load a new activity
-                        //val intent = Intent(this,MainActivity::class.java)
-                        //startActivity(intent)
-                    }
-                }*/
-
                 //Now, Load the Camera Intent
                 var cameraIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
                 startActivityForResult(cameraIntent, 101)
             }
         }
-
-
+        //Load Ad
+        val adRequest = AdRequest.Builder().build()
+        bannerAdView.loadAd(adRequest)
 
     }
 

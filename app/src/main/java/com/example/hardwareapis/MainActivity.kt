@@ -5,6 +5,8 @@ import android.os.Bundle
 import androidx.fragment.app.FragmentTransaction
 import androidx.navigation.findNavController
 import androidx.navigation.ui.setupWithNavController
+import com.google.android.gms.ads.MobileAds
+import com.google.android.gms.ads.RequestConfiguration
 import com.google.android.material.bottomnavigation.BottomNavigationView
 
 class MainActivity : AppCompatActivity() {
@@ -17,8 +19,7 @@ class MainActivity : AppCompatActivity() {
         val navController = findNavController(R.id.nav_fragment)
         bottomNavigationView.setupWithNavController(navController)
 
-//        val emailFragment = EmailFragment()
-//        val transaction: FragmentTransaction = fragmentManager!!.beginTransaction()
-//        transaction.replace(R.id.main)
+        //Initialize Ad as early as possible
+        MobileAds.initialize(this)
     }
 }
